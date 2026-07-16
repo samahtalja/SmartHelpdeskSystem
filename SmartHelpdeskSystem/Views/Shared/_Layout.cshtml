@@ -1,0 +1,126 @@
+﻿@using Microsoft.AspNetCore.Identity
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Smart Helpdesk</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SmartHelpdeskSystem.styles.css" asp-append-version="true" />
+</head>
+
+<body class="app-body">
+
+    @{
+        var controller = ViewContext.RouteData.Values["Controller"]?.ToString();
+        var action = ViewContext.RouteData.Values["Action"]?.ToString();
+        var isLandingPage = controller == "Home" && action == "Index";
+    }
+
+    @if (isLandingPage)
+    {
+        @RenderBody()
+    }
+    else
+    {
+        <div class="app-wrapper">
+
+            <aside class="sidebar">
+                <div class="sidebar-brand">
+                    <div class="brand-icon">💬</div>
+                    <div>
+                        <h4>Smart Helpdesk</h4>
+                        <span>Support System</span>
+                    </div>
+                </div>
+
+                <ul class="sidebar-menu">
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li>
+                            <a asp-controller="Home" asp-action="Dashboard">🏠 Dashboard</a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Tickets" asp-action="Index">🎫 Tickets</a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Categories" asp-action="Index">📂 Categories</a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Priorities" asp-action="Index">⚡ Priorities</a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Statuses" asp-action="Index">📌 Statuses</a>
+                        </li>
+
+                        <li>
+                            <a href="/api/tickets">🔗 API</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a asp-controller="Home" asp-action="Dashboard">🏠 Dashboard</a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="Tickets" asp-action="Index">🎫 My Tickets</a>
+                        </li>
+
+                        @if (!User.IsInRole("Admin"))
+                        {
+                            <li>
+                                <a asp-controller="Tickets" asp-action="Create">
+                                    ➕ New Ticket
+                                </a>
+                            </li>
+                        }
+                    }
+
+                </ul>
+            </aside>
+
+            <main class="main-content">
+                <header class="topbar">
+                    <div>
+                        <h5>@ViewData["Title"]</h5>
+                        <span>Manage support tickets efficiently</span>
+                    </div>
+
+                    <div class="topbar-right">
+                        <span class="notification">🔔</span>
+                        <partial name="_LoginPartial" />
+                    </div>
+                </header>
+
+                <section class="content-card">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            ✅ @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @RenderBody()
+                </section>
+            </main>
+
+        </div>
+    }
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

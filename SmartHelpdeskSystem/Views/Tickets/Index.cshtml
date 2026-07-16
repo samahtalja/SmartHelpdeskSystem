@@ -1,0 +1,112 @@
+@model IEnumerable<SmartHelpdeskSystem.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Tickets";
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<div class="page-header">
+    <div>
+        <h1>@(isAdmin ? "All Tickets" : "My Tickets")</h1>
+        <p>Manage and track support requests.</p>
+    </div>
+
+    @if (!isAdmin)
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            ➕ New Ticket
+        </a>
+    }
+</div>
+
+<div class="table-card">
+    <table class="table align-middle tickets-table">
+        <thead>
+            <tr>
+                <th>Ticket</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Due Date</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    var priorityClass = item.Priority?.PriorityName?.ToLower();
+                    var statusClass = item.Status?.StatusName?.ToLower().Replace(" ", "-");
+
+                    <tr>
+                        <td>
+                            <strong>@item.Title</strong>
+                            <br />
+                            <small class="text-muted">
+                                @(item.Description?.Length > 45
+                                    ? item.Description.Substring(0, 45) + "..."
+                                    : item.Description)
+                            </small>
+                        </td>
+
+                        <td>@item.Category?.CategoryName</td>
+
+                        <td>
+                            <span class="badge-priority @priorityClass">
+                                @item.Priority?.PriorityName
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="badge-status @statusClass">
+                                @item.Status?.StatusName
+                            </span>
+                        </td>
+
+                        <td>@item.CreatedAt.ToString("yyyy-MM-dd")</td>
+
+                        <td>
+                            @(item.DueDate.HasValue
+                                ? item.DueDate.Value.ToString("yyyy-MM-dd")
+                                : "-")
+                        </td>
+
+                        <td class="text-end">
+                            <a asp-action="Details"
+                               asp-route-id="@item.TicketId"
+                               class="btn btn-sm btn-outline-primary">
+                                Details
+                            </a>
+
+                            <a asp-action="Edit"
+                               asp-route-id="@item.TicketId"
+                               class="btn btn-sm btn-outline-warning">
+                                Edit
+                            </a>
+
+                            @if (isAdmin)
+                            {
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.TicketId"
+                                   class="btn btn-sm btn-outline-danger">
+                                    Delete
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        No tickets found.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

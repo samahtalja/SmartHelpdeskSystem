@@ -1,0 +1,146 @@
+@model SmartHelpdeskSystem.Models.Ticket
+@using SmartHelpdeskSystem.Models
+
+@{
+    ViewData["Title"] = "Ticket Details";
+    var comments = ViewBag.Comments as List<TicketComment>;
+    bool isAdmin = User.IsInRole("Admin");
+
+    var priorityClass = Model.Priority?.PriorityName?.ToLower();
+    var statusClass = Model.Status?.StatusName?.ToLower().Replace(" ", "-");
+}
+
+<div class="page-header">
+    <div>
+        <h1>🎫 Ticket Details</h1>
+        <p>View ticket information, status and conversation history.</p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            Back
+        </a>
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.TicketId"
+           class="btn btn-primary">
+            Edit Ticket
+        </a>
+    </div>
+</div>
+
+<div class="ticket-details-grid">
+
+    <div class="ticket-main-card">
+
+        <div class="ticket-title-row">
+            <div>
+                <h2>@Model.Title</h2>
+                <p class="text-muted mb-0">
+                    Created at @Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+                </p>
+            </div>
+
+            <span class="badge-status @statusClass">
+                @Model.Status?.StatusName
+            </span>
+        </div>
+
+        <hr />
+
+        <div class="mb-4">
+            <h5>Description</h5>
+            <p class="ticket-description">
+                @Model.Description
+            </p>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <span>Category</span>
+                <strong>@Model.Category?.CategoryName</strong>
+            </div>
+
+            <div class="info-item">
+                <span>Priority</span>
+                <strong>
+                    <span class="badge-priority @priorityClass">
+                        @Model.Priority?.PriorityName
+                    </span>
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Due Date</span>
+                <strong>
+                    @(Model.DueDate.HasValue
+                        ? Model.DueDate.Value.ToString("yyyy-MM-dd")
+                        : "-")
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Assigned Agent</span>
+                <strong>
+                    @(string.IsNullOrWhiteSpace(Model.AssignedAgentId)
+                        ? "Not assigned"
+                        : Model.AssignedAgentId)
+                </strong>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="comments-card">
+
+        <h4>💬 Comments</h4>
+
+        <div class="comments-list">
+
+            @if (comments != null && comments.Any())
+            {
+                foreach (var comment in comments)
+                {
+                    <div class="comment-item">
+                        <div class="comment-avatar">
+                            @(comment.UserId?.Substring(0, 1).ToUpper() ?? "U")
+                        </div>
+
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <strong>@comment.UserId</strong>
+                                <small>@comment.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                            </div>
+
+                            <p>@comment.CommentText</p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-comments">
+                    No comments yet.
+                </div>
+            }
+
+        </div>
+
+        <form asp-action="AddComment" method="post" class="comment-form">
+            <input type="hidden" name="ticketId" value="@Model.TicketId" />
+
+            <label class="form-label fw-bold">Add Comment</label>
+
+            <textarea name="commentText"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Write your comment here..."></textarea>
+
+            <button type="submit" class="btn btn-primary mt-3">
+                Add Comment
+            </button>
+        </form>
+
+    </div>
+
+</div>

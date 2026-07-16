@@ -1,0 +1,85 @@
+@model IEnumerable<SmartHelpdeskSystem.Models.Category>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="page-header">
+    <div>
+        <h1>📂 Ticket Categories</h1>
+        <p>Manage ticket categories and departments.</p>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        ➕ New Category
+    </a>
+</div>
+
+<div class="table-card">
+
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Category Name</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="
+                                    width:10px;
+                                    height:10px;
+                                    border-radius:50%;
+                                    background:#3b82f6;
+                                    display:inline-block;">
+                                </span>
+
+                                <strong>@item.CategoryName</strong>
+                            </div>
+                        </td>
+
+                        <td class="text-end">
+
+                            <a asp-action="Edit"
+                               asp-route-id="@item.CategoryId"
+                               class="btn btn-sm btn-outline-warning">
+                                Edit
+                            </a>
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.CategoryId"
+                               class="btn btn-sm btn-outline-primary">
+                                Details
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@item.CategoryId"
+                               class="btn btn-sm btn-outline-danger">
+                                Delete
+                            </a>
+
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2" class="text-center text-muted py-4">
+                        No categories found.
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+
+</div>

@@ -1,0 +1,39 @@
+@model SmartHelpdeskSystem.Models.Category
+
+@{
+    ViewData["Title"] = "Category Details";
+}
+
+<div class="page-header">
+    <div>
+        <h1>📂 Category Details</h1>
+        <p>View category information.</p>
+    </div>
+</div>
+
+<div class="form-card">
+
+    <div class="mb-4">
+        <label class="form-label fw-bold">
+            Category Name
+        </label>
+
+        <div class="form-control bg-light">
+            @Model.CategoryName
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a asp-action="Edit"
+           asp-route-id="@Model.CategoryId"
+           class="btn btn-warning">
+            Edit
+        </a>
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            Back
+        </a>
+    </div>
+
+</div>

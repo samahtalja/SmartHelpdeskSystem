@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Smart Helpdesk";
+}
+
+<div class="premium-landing">
+
+    <nav class="landing-nav">
+        <div class="landing-brand">
+            <span>💬</span>
+            Smart Helpdesk
+        </div>
+
+        <div class="landing-actions">
+            <a asp-area="Identity" asp-page="/Account/Login" class="nav-login">Login</a>
+            <a asp-area="Identity" asp-page="/Account/Register" class="nav-register">Create Account</a>
+        </div>
+    </nav>
+
+    <section class="premium-hero">
+        <div class="premium-left">
+            <span class="premium-badge">🚀 Modern IT Support Platform</span>
+
+            <h1>
+                Resolve support tickets faster with a smarter helpdesk.
+            </h1>
+
+            <p>
+                A professional ticket management system for tracking issues,
+                assigning agents, managing priorities, and monitoring resolution progress.
+            </p>
+
+            <div class="premium-buttons">
+                <a asp-area="Identity" asp-page="/Account/Login" class="primary-hero-btn">Get Started</a>
+                <a asp-area="Identity" asp-page="/Account/Register" class="secondary-hero-btn">Create Account</a>
+            </div>
+        </div>
+
+        <div class="premium-right">
+            <div class="glass-dashboard">
+                <div class="glass-header">
+                    <span></span><span></span><span></span>
+                </div>
+
+                <div class="glass-stats">
+                    <div>
+                        <small>Open</small>
+                        <strong>24</strong>
+                    </div>
+                    <div>
+                        <small>Progress</small>
+                        <strong>12</strong>
+                    </div>
+                    <div>
+                        <small>Closed</small>
+                        <strong>48</strong>
+                    </div>
+                </div>
+
+                <div class="ticket-preview">
+                    <b>VPN Connection Issue</b>
+                    <span class="mini-badge high">High</span>
+                </div>
+
+                <div class="ticket-preview">
+                    <b>Email Service Down</b>
+                    <span class="mini-badge progress">In Progress</span>
+                </div>
+
+                <div class="ticket-preview">
+                    <b>Printer Not Working</b>
+                    <span class="mini-badge low">Low</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>

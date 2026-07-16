@@ -1,0 +1,55 @@
+@model SmartHelpdeskSystem.Models.Priority
+
+@{
+    ViewData["Title"] = "Priority Details";
+}
+
+<div class="page-header">
+    <div>
+        <h1>⚡ Priority Details</h1>
+        <p>View priority information.</p>
+    </div>
+</div>
+
+<div class="form-card">
+
+    <div class="mb-4">
+
+        <label class="form-label fw-bold">
+            Priority Name
+        </label>
+
+        @{
+            string badgeClass = Model.PriorityName?.ToLower() switch
+            {
+                "high" => "bg-danger",
+                "medium" => "bg-warning text-dark",
+                "low" => "bg-success",
+                _ => "bg-primary"
+            };
+        }
+
+        <div class="mt-2">
+            <span class="badge @badgeClass fs-6 p-2">
+                @Model.PriorityName
+            </span>
+        </div>
+
+    </div>
+
+    <div class="d-flex gap-2">
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.PriorityId"
+           class="btn btn-warning">
+            ✏️ Edit
+        </a>
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            Back
+        </a>
+
+    </div>
+
+</div>

@@ -1,0 +1,69 @@
+@model SmartHelpdeskSystem.Models.Status
+
+@{
+    ViewData["Title"] = "Delete Status";
+}
+
+<div class="page-header">
+    <div>
+        <h1>🗑️ Delete Status</h1>
+        <p>Remove a status from the helpdesk workflow.</p>
+    </div>
+</div>
+
+<div class="form-card">
+
+    <div class="alert alert-danger mb-4">
+        <h5 class="mb-2">⚠ Warning</h5>
+        <p class="mb-0">
+            Are you sure you want to delete this status?
+            This action cannot be undone.
+        </p>
+    </div>
+
+    <div class="mb-4">
+
+        <label class="form-label fw-bold">
+            Status Name
+        </label>
+
+        @{
+            string badgeClass = Model.StatusName?.ToLower() switch
+            {
+                "open" => "bg-success",
+                "in progress" => "bg-warning text-dark",
+                "resolved" => "bg-primary",
+                "closed" => "bg-secondary",
+                _ => "bg-dark"
+            };
+        }
+
+        <div class="mt-2">
+            <span class="badge @badgeClass fs-6 p-2">
+                @Model.StatusName
+            </span>
+        </div>
+
+    </div>
+
+    <form asp-action="Delete">
+
+        <input type="hidden" asp-for="StatusId" />
+
+        <div class="d-flex gap-2">
+
+            <button type="submit"
+                    class="btn btn-danger">
+                🗑️ Delete Status
+            </button>
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</div>

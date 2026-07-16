@@ -1,0 +1,56 @@
+@model SmartHelpdeskSystem.Models.Status
+
+@{
+    ViewData["Title"] = "Status Details";
+}
+
+<div class="page-header">
+    <div>
+        <h1>📌 Status Details</h1>
+        <p>View status information used in the helpdesk workflow.</p>
+    </div>
+</div>
+
+<div class="form-card">
+
+    <div class="mb-4">
+
+        <label class="form-label fw-bold">
+            Status Name
+        </label>
+
+        @{
+            string badgeClass = Model.StatusName?.ToLower() switch
+            {
+                "open" => "bg-success",
+                "in progress" => "bg-warning text-dark",
+                "resolved" => "bg-primary",
+                "closed" => "bg-secondary",
+                _ => "bg-dark"
+            };
+        }
+
+        <div class="mt-2">
+            <span class="badge @badgeClass fs-6 p-2">
+                @Model.StatusName
+            </span>
+        </div>
+
+    </div>
+
+    <div class="d-flex gap-2">
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.StatusId"
+           class="btn btn-warning">
+            ✏️ Edit
+        </a>
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            Back
+        </a>
+
+    </div>
+
+</div>

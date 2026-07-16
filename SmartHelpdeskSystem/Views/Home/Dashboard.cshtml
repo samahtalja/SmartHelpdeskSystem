@@ -1,0 +1,197 @@
+﻿@using SmartHelpdeskSystem.Models
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+
+var recentTickets = ViewBag.RecentTickets as List<Ticket>;
+    bool isAdmin = ViewBag.IsAdmin ?? false;
+
+    int total = ViewBag.TotalTickets ?? 0;
+    int open = ViewBag.OpenTickets ?? 0;
+    int progress = ViewBag.InProgressTickets ?? 0;
+    int resolved = ViewBag.ResolvedTickets ?? 0;
+    int closed = ViewBag.ClosedTickets ?? 0;
+
+    double openDeg = total > 0 ? open * 360.0 / total : 0;
+    double progressDeg = total > 0 ? progress * 360.0 / total : 0;
+    double resolvedDeg = total > 0 ? resolved * 360.0 / total : 0;
+
+    double openEnd = openDeg;
+    double progressEnd = openDeg + progressDeg;
+    double resolvedEnd = openDeg + progressDeg + resolvedDeg;
+
+    string chartStyle = total > 0
+        ? $"background: conic-gradient(#22c55e 0deg {openEnd}deg, #f59e0b {openEnd}deg {progressEnd}deg, #3b82f6 {progressEnd}deg {resolvedEnd}deg, #0f172a {resolvedEnd}deg 360deg);"
+        : "background: #e2e8f0;";
+
+
+}
+
+<div class="dashboard-header mb-4">
+
+  
+    @if (isAdmin)
+    {
+        <h2>👑 Admin Dashboard</h2>
+        <p>Monitor all tickets, users and system activity.</p>
+    }
+    else
+    {
+        <h2>👤 My Dashboard</h2>
+        <p>Track your support requests and ticket progress.</p>
+    }
+  
+
+</div>
+
+@if (!isAdmin)
+{
+    <div class="mb-4">
+        <a asp-controller="Tickets"
+           asp-action="Create"
+           class="btn btn-primary">
+            ➕ Create New Ticket
+        </a>
+    </div>
+}
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon blue">🎫</div>
+            <div>
+
+                @if (isAdmin)
+                {
+                    <h6>Total Tickets</h6>
+                    <h2>@total</h2>
+                    <span>All support requests</span>
+                }
+                else
+                {
+                    <h6>My Tickets</h6>
+                    <h2>@total</h2>
+                    <span>Your support requests</span>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon green">🟢</div>
+            <div>
+                <h6>Open Tickets</h6>
+                <h2>@open</h2>
+                <span>Waiting for support</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon yellow">⏳</div>
+            <div>
+                <h6>In Progress</h6>
+                <h2>@progress</h2>
+                <span>Being handled</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon red">✅</div>
+            <div>
+                <h6>Closed Tickets</h6>
+                <h2>@closed</h2>
+                <span>Resolved issues</span>
+            </div>
+        </div>
+    </div>
+   
+</div>
+
+<div class="dashboard-grid">
+
+
+    <div class="dash-panel">
+        <h5>Tickets by Status</h5>
+
+        <div class="fake-chart">
+            <div class="chart-ring" style="@chartStyle"></div>
+
+            <div class="chart-legend">
+                <p><span class="dot green-dot"></span> Open (@open)</p>
+                <p><span class="dot yellow-dot"></span> In Progress (@progress)</p>
+                <p><span class="dot blue-dot"></span> Resolved (@resolved)</p>
+                <p><span class="dot dark-dot"></span> Closed (@closed)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-panel">
+
+        @if (isAdmin)
+        {
+            <h5>Recent System Tickets</h5>
+        }
+        else
+        {
+            <h5>My Recent Tickets</h5>
+        }
+
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Ticket</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (recentTickets != null && recentTickets.Any())
+                {
+                    foreach (var ticket in recentTickets)
+                    {
+                        <tr>
+                            <td>@ticket.Title</td>
+
+                            <td>@ticket.Category?.CategoryName</td>
+
+                            <td>
+                                <span class="badge-priority @(ticket.Priority?.PriorityName?.ToLower())">
+                                    @ticket.Priority?.PriorityName
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge-status @(ticket.Status?.StatusName?.ToLower().Replace(" ", "-"))">
+                                    @ticket.Status?.StatusName
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            No tickets found.
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+    </div>
+  
+
+</div>

@@ -1,0 +1,73 @@
+@model SmartHelpdeskSystem.Models.Ticket
+
+@{
+    ViewData["Title"] = "Edit Ticket";
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<h1>Edit Ticket</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+
+            <input type="hidden" asp-for="TicketId" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="UserId" />
+
+            @if (!isAdmin)
+            {
+                <input type="hidden" asp-for="AssignedAgentId" />
+                <input type="hidden" asp-for="StatusId" />
+            }
+
+            <div class="form-group mb-3">
+                <label asp-for="Title"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Description"></label>
+                <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            @if (isAdmin)
+            {
+                <div class="form-group mb-3">
+                    <label asp-for="AssignedAgentId" class="control-label">Assigned Agent</label>
+                    <input asp-for="AssignedAgentId" class="form-control" placeholder="Enter agent name or email" />
+                </div>
+            }
+
+            <div class="form-group mb-3">
+                <label>Category</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Priority</label>
+                <select asp-for="PriorityId" class="form-control" asp-items="ViewBag.PriorityId"></select>
+            </div>
+
+            @if (isAdmin)
+            {
+                <div class="form-group mb-3">
+                    <label>Status</label>
+                    <select asp-for="StatusId" class="form-control" asp-items="ViewBag.StatusId"></select>
+                </div>
+            }
+
+            <div class="form-group mb-3">
+                <label>Due Date</label>
+                <input asp-for="DueDate" class="form-control" type="date" />
+            </div>
+
+            <input type="submit" value="Save Changes" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary">Back</a>
+
+        </form>
+    </div>
+</div>

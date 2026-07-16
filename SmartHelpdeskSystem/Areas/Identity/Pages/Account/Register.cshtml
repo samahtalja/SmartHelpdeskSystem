@@ -1,0 +1,80 @@
+@page
+@model RegisterModel
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Smart Helpdesk</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body class="linear-login-page">
+
+    <div class="linear-glow glow-one"></div>
+    <div class="linear-glow glow-two"></div>
+
+    <div class="linear-login-card">
+
+        <div class="linear-logo">✨</div>
+
+        <h1>Create Account</h1>
+        <p>Join Smart Helpdesk and start managing support tickets professionally.</p>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="linear-field">
+                <input asp-for="Input.Email"
+                       autocomplete="username"
+                       aria-required="true"
+                       placeholder="Email address" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="linear-field">
+                <input asp-for="Input.Password"
+                       autocomplete="new-password"
+                       aria-required="true"
+                       placeholder="Password" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="linear-field">
+                <input asp-for="Input.ConfirmPassword"
+                       autocomplete="new-password"
+                       aria-required="true"
+                       placeholder="Confirm password" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="linear-login-btn">
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="linear-register">
+            Already have an account?
+            <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">
+                Login
+            </a>
+        </div>
+
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+
+</body>
+</html>

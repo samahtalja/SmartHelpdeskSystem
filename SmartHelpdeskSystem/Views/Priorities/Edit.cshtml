@@ -1,0 +1,61 @@
+@model SmartHelpdeskSystem.Models.Priority
+
+@{
+    ViewData["Title"] = "Edit Priority";
+}
+
+<div class="page-header">
+    <div>
+        <h1>⚡ Edit Priority</h1>
+        <p>Update priority information.</p>
+    </div>
+</div>
+
+<div class="form-card">
+
+    <form asp-action="Edit">
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3"></div>
+
+        <input type="hidden" asp-for="PriorityId" />
+
+        <div class="mb-4">
+
+            <label asp-for="PriorityName"
+                   class="form-label fw-bold">
+                Priority Name
+            </label>
+
+            <input asp-for="PriorityName"
+                   class="form-control form-control-lg"
+                   placeholder="High, Medium, Low..." />
+
+            <span asp-validation-for="PriorityName"
+                  class="text-danger"></span>
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <button type="submit"
+                    class="btn btn-primary">
+                💾 Save Changes
+            </button>
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+                Back
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
