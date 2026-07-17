@@ -10,57 +10,125 @@
 
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Create">
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Create" method="post">
 
-            <div class="form-group mb-3">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" placeholder="Enter ticket title" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger mb-3">
+            </div>
+
+            <div class="alert alert-info">
+                The ticket status will be set automatically to
+                <strong>Open</strong>.
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Describe your issue"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="AssignedAgentId" class="control-label">Assigned Agent</label>
-                <input asp-for="AssignedAgentId" class="form-control" placeholder="Enter agent name or email" />
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="CategoryId" class="control-label">Category</label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+                <label asp-for="Title"
+                       class="control-label">
+                </label>
+
+                <input asp-for="Title"
+                       class="form-control"
+                       placeholder="Enter ticket title" />
+
+                <span asp-validation-for="Title"
+                      class="text-danger">
+                </span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="PriorityId" class="control-label">Priority</label>
-                <select asp-for="PriorityId" class="form-control" asp-items="ViewBag.PriorityId"></select>
+                <label asp-for="Description"
+                       class="control-label">
+                </label>
+
+                <textarea asp-for="Description"
+                          class="form-control"
+                          rows="5"
+                          placeholder="Describe your issue">
+                </textarea>
+
+                <span asp-validation-for="Description"
+                      class="text-danger">
+                </span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="StatusId" class="control-label">Status</label>
-                <select asp-for="StatusId" class="form-control" asp-items="ViewBag.StatusId"></select>
+                <label asp-for="CategoryId"
+                       class="control-label">
+                    Category
+                </label>
+
+                <select asp-for="CategoryId"
+                        class="form-control"
+                        asp-items="ViewBag.CategoryId">
+
+                    <option value="">
+                        -- Select Category --
+                    </option>
+
+                </select>
+
+                <span asp-validation-for="CategoryId"
+                      class="text-danger">
+                </span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="DueDate" class="control-label">Due Date</label>
-                <input asp-for="DueDate" class="form-control" type="date" />
-                <span asp-validation-for="DueDate" class="text-danger"></span>
+                <label asp-for="PriorityId"
+                       class="control-label">
+                    Priority
+                </label>
+
+                <select asp-for="PriorityId"
+                        class="form-control"
+                        asp-items="ViewBag.PriorityId">
+
+                    <option value="">
+                        -- Select Priority --
+                    </option>
+
+                </select>
+
+                <span asp-validation-for="PriorityId"
+                      class="text-danger">
+                </span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="DueDate"
+                       class="control-label">
+                    Due Date
+                </label>
+
+                <input asp-for="DueDate"
+                       class="form-control"
+                       type="date" />
+
+                <span asp-validation-for="DueDate"
+                      class="text-danger">
+                </span>
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Submit Ticket" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back</a>
+                <button type="submit"
+                        class="btn btn-primary">
+                    Submit Ticket
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+                    Back
+                </a>
             </div>
 
         </form>
+
     </div>
 </div>
 
 @section Scripts {
     @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial");
     }
 }

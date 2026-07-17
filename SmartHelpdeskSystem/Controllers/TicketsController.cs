@@ -17,6 +17,10 @@ namespace SmartHelpdeskSystem.Controllers
             _context = context;
         }
 
+        // =========================================================
+        // عرض التذاكر
+        // =========================================================
+
         // GET: Tickets
         public async Task<IActionResult> Index()
         {
@@ -26,14 +30,20 @@ namespace SmartHelpdeskSystem.Controllers
                 .Include(t => t.Status)
                 .AsQueryable();
 
+          
             if (!User.IsInRole("Admin"))
             {
                 var userId = User.Identity!.Name;
+
                 tickets = tickets.Where(t => t.UserId == userId);
             }
 
             return View(await tickets.ToListAsync());
         }
+
+        // =========================================================
+        // تفاصيل التذكرة
+        // =========================================================
 
         // GET: Tickets/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -47,14 +57,15 @@ namespace SmartHelpdeskSystem.Controllers
                 .Include(t => t.Category)
                 .Include(t => t.Priority)
                 .Include(t => t.Status)
-                .FirstOrDefaultAsync(m => m.TicketId == id);
+                .FirstOrDefaultAsync(t => t.TicketId == id);
 
             if (ticket == null)
             {
                 return NotFound();
             }
 
-            if (!User.IsInRole("Admin") && ticket.UserId != User.Identity!.Name)
+            if (!User.IsInRole("Admin") &&
+                ticket.UserId != User.Identity!.Name)
             {
                 return Forbid();
             }
@@ -67,11 +78,17 @@ namespace SmartHelpdeskSystem.Controllers
             return View(ticket);
         }
 
+        // =========================================================
+        // إنشاء تذكرة
+        // =========================================================
+
         // GET: Tickets/Create
         [Authorize(Roles = "User")]
         public IActionResult Create()
         {
-            LoadDropdowns();
+           
+            LoadCreateDropdowns();
+
             return View();
         }
 
@@ -80,24 +97,62 @@ namespace SmartHelpdeskSystem.Controllers
         [Authorize(Roles = "User")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Title,Description,DueDate,CategoryId,PriorityId,StatusId")] Ticket ticket)
+            [Bind("Title,Description,DueDate,CategoryId,PriorityId")]
+            Ticket ticket)
         {
+           
+            var openStatus = await _context.Statuses
+                .FirstOrDefaultAsync(s => s.StatusName == "Open");
+
+            if (openStatus == null)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Open status was not found in the database.");
+
+                LoadCreateDropdowns(
+                    ticket.CategoryId,
+                    ticket.PriorityId);
+
+                return View(ticket);
+            }
+
+            
+            ticket.StatusId = openStatus.StatusId;
+            ticket.CreatedAt = DateTime.Now;
+            ticket.UpdatedAt = null;
+            ticket.UserId = User.Identity!.Name;
+            ticket.AssignedAgentId = null;
+
+          
+            ModelState.Remove(nameof(Ticket.StatusId));
+            ModelState.Remove(nameof(Ticket.Status));
+            ModelState.Remove(nameof(Ticket.UserId));
+            ModelState.Remove(nameof(Ticket.AssignedAgentId));
+
             if (ModelState.IsValid)
             {
-                ticket.CreatedAt = DateTime.Now;
-                ticket.UserId = User.Identity!.Name;
-                ticket.AssignedAgentId = null;
+                _context.Tickets.Add(ticket);
 
-                _context.Add(ticket);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = "Ticket created successfully.";
+                TempData["Success"] =
+                    "Ticket created successfully.";
+
                 return RedirectToAction(nameof(Index));
             }
 
-            LoadDropdowns(ticket.CategoryId, ticket.PriorityId, ticket.StatusId);
+         
+            LoadCreateDropdowns(
+                ticket.CategoryId,
+                ticket.PriorityId);
+
             return View(ticket);
         }
+
+        // =========================================================
+        // تعديل التذكرة
+        // =========================================================
 
         // GET: Tickets/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -114,12 +169,18 @@ namespace SmartHelpdeskSystem.Controllers
                 return NotFound();
             }
 
-            if (!User.IsInRole("Admin") && ticket.UserId != User.Identity!.Name)
+        
+            if (!User.IsInRole("Admin") &&
+                ticket.UserId != User.Identity!.Name)
             {
                 return Forbid();
             }
 
-            LoadDropdowns(ticket.CategoryId, ticket.PriorityId, ticket.StatusId);
+            LoadDropdowns(
+                ticket.CategoryId,
+                ticket.PriorityId,
+                ticket.StatusId);
+
             return View(ticket);
         }
 
@@ -128,7 +189,10 @@ namespace SmartHelpdeskSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("TicketId,Title,Description,CreatedAt,DueDate,AssignedAgentId,CategoryId,PriorityId,StatusId,UserId")] Ticket ticket)
+            [Bind(
+                "TicketId,Title,Description,CreatedAt,DueDate," +
+                "AssignedAgentId,CategoryId,PriorityId,StatusId,UserId")]
+            Ticket ticket)
         {
             if (id != ticket.TicketId)
             {
@@ -144,21 +208,31 @@ namespace SmartHelpdeskSystem.Controllers
                 return NotFound();
             }
 
-            if (!User.IsInRole("Admin") && originalTicket.UserId != User.Identity!.Name)
+        
+            if (!User.IsInRole("Admin") &&
+                originalTicket.UserId != User.Identity!.Name)
             {
                 return Forbid();
             }
 
             if (!User.IsInRole("Admin"))
             {
+              
                 ticket.UserId = originalTicket.UserId;
                 ticket.StatusId = originalTicket.StatusId;
-                ticket.AssignedAgentId = originalTicket.AssignedAgentId;
+                ticket.AssignedAgentId =
+                    originalTicket.AssignedAgentId;
             }
             else
             {
+              
                 ticket.UserId = originalTicket.UserId;
             }
+
+            ticket.CreatedAt = originalTicket.CreatedAt;
+
+            ModelState.Remove(nameof(Ticket.Status));
+            ModelState.Remove(nameof(Ticket.UserId));
 
             if (ModelState.IsValid)
             {
@@ -167,9 +241,12 @@ namespace SmartHelpdeskSystem.Controllers
                     ticket.UpdatedAt = DateTime.Now;
 
                     _context.Update(ticket);
+
                     await _context.SaveChangesAsync();
 
-                    TempData["Success"] = "Ticket updated successfully.";
+                    TempData["Success"] =
+                        "Ticket updated successfully.";
+
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -183,9 +260,17 @@ namespace SmartHelpdeskSystem.Controllers
                 }
             }
 
-            LoadDropdowns(ticket.CategoryId, ticket.PriorityId, ticket.StatusId);
+            LoadDropdowns(
+                ticket.CategoryId,
+                ticket.PriorityId,
+                ticket.StatusId);
+
             return View(ticket);
         }
+
+        // =========================================================
+        // حذف التذكرة
+        // =========================================================
 
         // GET: Tickets/Delete/5
         [Authorize(Roles = "Admin")]
@@ -200,7 +285,7 @@ namespace SmartHelpdeskSystem.Controllers
                 .Include(t => t.Category)
                 .Include(t => t.Priority)
                 .Include(t => t.Status)
-                .FirstOrDefaultAsync(m => m.TicketId == id);
+                .FirstOrDefaultAsync(t => t.TicketId == id);
 
             if (ticket == null)
             {
@@ -221,61 +306,119 @@ namespace SmartHelpdeskSystem.Controllers
             if (ticket != null)
             {
                 _context.Tickets.Remove(ticket);
+
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] =
+                    "Ticket deleted successfully.";
             }
 
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Ticket deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
+
+        // =========================================================
+        // إضافة تعليق
+        // =========================================================
 
         // POST: Tickets/AddComment
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddComment(int ticketId, string commentText)
+        public async Task<IActionResult> AddComment(
+            int ticketId,
+            string commentText)
         {
-            var ticket = await _context.Tickets.FindAsync(ticketId);
+            var ticket = await _context.Tickets
+                .FindAsync(ticketId);
 
             if (ticket == null)
             {
                 return NotFound();
             }
 
-            if (!User.IsInRole("Admin") && ticket.UserId != User.Identity!.Name)
+          
+            if (!User.IsInRole("Admin") &&
+                ticket.UserId != User.Identity!.Name)
             {
                 return Forbid();
             }
 
             if (string.IsNullOrWhiteSpace(commentText))
             {
-                return RedirectToAction("Details", new { id = ticketId });
+                return RedirectToAction(
+                    nameof(Details),
+                    new { id = ticketId });
             }
 
             var comment = new TicketComment
             {
                 TicketId = ticketId,
-                CommentText = commentText,
+                CommentText = commentText.Trim(),
                 UserId = User.Identity?.Name ?? "Anonymous",
                 CreatedAt = DateTime.Now
             };
 
             _context.TicketComments.Add(comment);
+
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Comment added successfully.";
-            return RedirectToAction("Details", new { id = ticketId });
+            TempData["Success"] =
+                "Comment added successfully.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = ticketId });
         }
+
+        // =========================================================
+        // دوال مساعدة
+        // =========================================================
 
         private bool TicketExists(int id)
         {
-            return _context.Tickets.Any(e => e.TicketId == id);
+            return _context.Tickets
+                .Any(t => t.TicketId == id);
         }
 
-        private void LoadDropdowns(int? categoryId = null, int? priorityId = null, int? statusId = null)
+       
+        private void LoadCreateDropdowns(
+            int? categoryId = null,
+            int? priorityId = null)
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", categoryId);
-            ViewData["PriorityId"] = new SelectList(_context.Priorities, "PriorityId", "PriorityName", priorityId);
-            ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusId", "StatusName", statusId);
+            ViewData["CategoryId"] = new SelectList(
+                _context.Categories,
+                "CategoryId",
+                "CategoryName",
+                categoryId);
+
+            ViewData["PriorityId"] = new SelectList(
+                _context.Priorities,
+                "PriorityId",
+                "PriorityName",
+                priorityId);
+        }
+
+        private void LoadDropdowns(
+            int? categoryId = null,
+            int? priorityId = null,
+            int? statusId = null)
+        {
+            ViewData["CategoryId"] = new SelectList(
+                _context.Categories,
+                "CategoryId",
+                "CategoryName",
+                categoryId);
+
+            ViewData["PriorityId"] = new SelectList(
+                _context.Priorities,
+                "PriorityId",
+                "PriorityName",
+                priorityId);
+
+            ViewData["StatusId"] = new SelectList(
+                _context.Statuses,
+                "StatusId",
+                "StatusName",
+                statusId);
         }
     }
 }
